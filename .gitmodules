@@ -1,3 +1,6 @@
 [submodule "ext/glfw"]
 	path = ext/glfw
 	url = https://github.com/glfw/glfw.git
+[submodule "ext/pixo"]
+	path = ext/pixo
+	url = git@github.com:cconstantine/pixo.git
