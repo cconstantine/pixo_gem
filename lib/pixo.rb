@@ -1,6 +1,6 @@
 require "pixo/version"
 
-require File.expand_path('../pixo_native', __FILE__)
+require File.expand_path('../libpixgem', __FILE__)
 
 module Pixo
   # Your code goes here...

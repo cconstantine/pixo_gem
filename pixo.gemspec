@@ -25,9 +25,10 @@ Gem::Specification.new do |spec|
   spec.extensions << "ext/pixo_native/extconf.rb"
 
 
-  spec.files         = `git ls-files -z`.split("\x0").reject do |f|
-    f.match(%r{^(test|spec|features)/})
-  end
+  spec.files = Dir['**/*'].keep_if { |file| File.file?(file) }
+  #spec.files         = `git ls-files -z`.split("\x0").reject do |f|
+  #  f.match(%r{^(test|spec|features)/})
+  #end
   spec.bindir        = "exe"
   spec.executables   = spec.files.grep(%r{^exe/}) { |f| File.basename(f) }
   spec.require_paths = ["lib"]
