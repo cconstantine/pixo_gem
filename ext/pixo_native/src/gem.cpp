@@ -12,9 +12,10 @@
 
 // Include GLFW
 #include <GLFW/glfw3.h>
-#include <fade_candy.hpp>
 
-#include <app.hpp>
+#include <pixlib.hpp>
+
+using namespace Pixlib;
 
 class Holder {
 public:
@@ -185,22 +186,22 @@ VALUE application_tick(VALUE self, VALUE r_pattern)
 // std::thread *background;
 void Init_libpixgem() {
   VALUE Pixo = rb_define_module("Pixo");
+  VALUE Native = rb_define_module_under(Pixo, "Native");
 
   // Initialise GLFW
   if( !glfwInit() )
   {
       ALOGV( "Failed to initialize GLFW\n" );
       getchar();
-
   }  
 
-  VALUE PatternClass = rb_define_class_under(Pixo, "Pattern", rb_cObject);
+  VALUE PatternClass = rb_define_class_under(Native, "Pattern", rb_cObject);
 
   rb_define_alloc_func(PatternClass, pattern_allocate);
   rb_define_method(PatternClass, "initialize", (VALUE(*)(ANYARGS))pattern_initialize, 2);
 
 
-  VALUE ApplicationClass = rb_define_class_under(Pixo, "Application", rb_cObject);
+  VALUE ApplicationClass = rb_define_class_under(Native, "Application", rb_cObject);
 
   rb_define_alloc_func(ApplicationClass, application_allocate);
   rb_define_method(ApplicationClass, "initialize", (VALUE(*)(ANYARGS))application_initialize, 0);
