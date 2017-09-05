@@ -19,6 +19,9 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++14 -fPIC -fpermissive")
 
 add_library(pixgem SHARED
   pixo_native/src/gem.cpp
+  pixo_native/src/holder.cpp
+  pixo_native/src/application.cpp
+  pixo_native/src/pattern.cpp
   )
 target_link_libraries(pixgem glfw libglew_static pthread  pixlib)
 
