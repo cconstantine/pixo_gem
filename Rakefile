@@ -5,4 +5,4 @@ task :default => :spec
 require 'rake/extensiontask'
 spec = Gem::Specification.load('pixo.gemspec')
 
-Rake::ExtensionTask.new('pixo_native', spec)
+Rake::ExtensionTask.new('libpixgem', spec)

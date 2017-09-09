@@ -12,7 +12,13 @@ elsif RbConfig::CONFIG['host_os'] =~ /mswin/
   generator = '-G "NMake Makefiles"'
 end
 
-exec format('cmake %s -DCMAKE_INSTALL_PREFIX=../../ -DRUBY_EXECUTABLE=%s %s ../ ', generator, ruby_executable, ARGV.join(' '))
+current_dir = File.dirname(__FILE__)
+exec format(
+  'cmake %s -DCMAKE_INSTALL_PREFIX=../../ -DRUBY_EXECUTABLE=%s %s %s/../ ',
+  generator,
+  ruby_executable,
+  ARGV.join(' '),
+  current_dir)
 
 
 

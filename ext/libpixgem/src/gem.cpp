@@ -17,6 +17,7 @@
 
 #include "pattern.hpp"
 #include "application.hpp"
+#include "fade_candy.hpp"
 
 using namespace Pixlib;
 
@@ -34,14 +35,16 @@ extern "C" void Init_libpixgem() {
   }  
 
   VALUE PatternClass = rb_define_class_under(Native, "Pattern", rb_cObject);
-
   rb_define_alloc_func(PatternClass, pattern_allocate);
   rb_define_method(PatternClass, "initialize", (VALUE(*)(ANYARGS))pattern_initialize, 2);
 
 
   VALUE ApplicationClass = rb_define_class_under(Native, "Application", rb_cObject);
-
   rb_define_alloc_func(ApplicationClass, application_allocate);
   rb_define_method(ApplicationClass, "initialize", (VALUE(*)(ANYARGS))application_initialize, 0);
   rb_define_method(ApplicationClass, "tick", (VALUE(*)(ANYARGS))application_tick, 1);
+
+  VALUE FadeCandyClass = rb_define_class_under(Native, "FadeCandy", rb_cObject);
+  rb_define_alloc_func(FadeCandyClass, fade_candy_allocate);
+  rb_define_method(FadeCandyClass, "initialize", (VALUE(*)(ANYARGS))fade_candy_initialize, 2);
 }

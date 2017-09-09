@@ -3,7 +3,7 @@ cmake_minimum_required(VERSION 3.0)
 project(pixo)
 
 
-include_directories( ${CMAKE_CURRENT_SOURCE_DIR}/pixo_native/include )
+include_directories( ${CMAKE_CURRENT_SOURCE_DIR}/libpixgem/include )
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/pixo EXCLUDE_FROM_ALL)
 include_directories(${PIXLIB_INCLUDE})
 
@@ -18,10 +18,11 @@ include_directories(BEFORE ${RUBY_INCLUDE_DIRS})
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++14 -fPIC -fpermissive")
 
 add_library(pixgem SHARED
-  pixo_native/src/gem.cpp
-  pixo_native/src/holder.cpp
-  pixo_native/src/application.cpp
-  pixo_native/src/pattern.cpp
+  libpixgem/src/gem.cpp
+  libpixgem/src/holder.cpp
+  libpixgem/src/application.cpp
+  libpixgem/src/pattern.cpp
+  libpixgem/src/fade_candy.cpp
   )
 target_link_libraries(pixgem glfw libglew_static pthread  pixlib)
 

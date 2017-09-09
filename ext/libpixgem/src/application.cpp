@@ -84,7 +84,11 @@ VALUE application_tick(VALUE self, VALUE r_pattern)
   PatternHolder * pattern_holder;
   Data_Get_Struct(r_pattern, PatternHolder, pattern_holder);
  
-
+  if(!app_holder->window) {
+    return self;
+  }
+  rb_need_block();
+    
   if(!glfwWindowShouldClose(app_holder->window)) {
     glfwMakeContextCurrent(app_holder->window);
     glEnable(GL_DEPTH_TEST);
@@ -95,6 +99,8 @@ VALUE application_tick(VALUE self, VALUE r_pattern)
 
     int width, height;
     glfwGetFramebufferSize(app_holder->window, &width, &height);
+
+    rb_yield(Qundef);
 
     app_holder->app->tick(pattern_holder->pattern, width, height);
 
@@ -109,8 +115,14 @@ VALUE application_tick(VALUE self, VALUE r_pattern)
         glErr = glGetError();
     }
 
-  }
+  } else if (app_holder->window) {
+    glfwMakeContextCurrent(app_holder->window);
 
+    
+    // Close OpenGL window and terminate GLFW
+    glfwDestroyWindow(app_holder->window);
+    app_holder->window = nullptr;
+  }
 
   return self;
 }
