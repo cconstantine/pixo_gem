@@ -1,22 +1,15 @@
 #include "application.hpp"
 #include "pattern.hpp"
+#include "fade_candy.hpp"
 
 using namespace Pixlib;
 
 ApplicationHolder::ApplicationHolder() :
  app(nullptr),
- window(nullptr),
- fc(nullptr)
+ window(nullptr)
 { }
 
 ApplicationHolder::~ApplicationHolder() {
-  if (fc) {
-    fc->clear();
-
-    delete fc;
-    fc = nullptr;
-  }
-
   if(app) {
     delete app;
     app = nullptr;
@@ -25,7 +18,6 @@ ApplicationHolder::~ApplicationHolder() {
   if (window) {
     glfwMakeContextCurrent(window);
 
-    
     // Close OpenGL window and terminate GLFW
     glfwDestroyWindow(window);
     window = nullptr;
@@ -33,13 +25,21 @@ ApplicationHolder::~ApplicationHolder() {
 
 }
 
+void application_mark(ApplicationHolder * holder)
+{
+  for(VALUE fc : holder->fade_candies) {
+    rb_gc_mark(fc);
+  }
+}
+
 
 VALUE application_allocate(VALUE klass)
 {
   ApplicationHolder * holder = new ApplicationHolder();
 
-  return Data_Wrap_Struct(klass, NULL, deallocate, holder);
+  return Data_Wrap_Struct(klass, application_mark, deallocate, holder);
 }
+
 
 VALUE application_initialize(VALUE self)
 {
@@ -69,9 +69,7 @@ VALUE application_initialize(VALUE self)
   }
   glEnable(GL_DEPTH_TEST);
 
-  holder->fc = new FadeCandy("localhost", 8);
-  holder->app = new App(holder->fc); 
-
+  holder->app = new App();
   return self;
 }
 
@@ -87,20 +85,16 @@ VALUE application_tick(VALUE self, VALUE r_pattern)
   if(!app_holder->window) {
     return self;
   }
-  rb_need_block();
     
   if(!glfwWindowShouldClose(app_holder->window)) {
     glfwMakeContextCurrent(app_holder->window);
     glEnable(GL_DEPTH_TEST);
     glfwPollEvents();
 
-
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     int width, height;
     glfwGetFramebufferSize(app_holder->window, &width, &height);
-
-    rb_yield(Qundef);
 
     app_holder->app->tick(pattern_holder->pattern, width, height);
 
@@ -125,4 +119,18 @@ VALUE application_tick(VALUE self, VALUE r_pattern)
   }
 
   return self;
+}
+
+
+VALUE application_add_fadecandy(VALUE self, VALUE fc)
+{
+  ApplicationHolder * app_holder;
+  Data_Get_Struct(self, ApplicationHolder, app_holder);
+
+  FadeCandyHolder * fadecandy_holder;
+  Data_Get_Struct(fc, FadeCandyHolder, fadecandy_holder);
+
+
+  app_holder->fade_candies.push_back(fc);
+  app_holder->app->addFadeCandy(fadecandy_holder->fade_candy);
 }

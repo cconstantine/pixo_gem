@@ -23,6 +23,7 @@ add_library(pixgem SHARED
   libpixgem/src/application.cpp
   libpixgem/src/pattern.cpp
   libpixgem/src/fade_candy.cpp
+  libpixgem/src/camera.cpp
   )
 target_link_libraries(pixgem glfw libglew_static pthread  pixlib)
 

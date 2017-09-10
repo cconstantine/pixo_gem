@@ -14,12 +14,15 @@ public:
   virtual ~ApplicationHolder();
 
   Pixlib::App *app;
-  Pixlib::FadeCandy *fc;
   GLFWwindow* window;
+
+  std::vector<VALUE> fade_candies;
 };
 
 VALUE application_allocate(VALUE klass);
 
 VALUE application_initialize(VALUE self);
+
+VALUE application_add_fadecandy(VALUE self, VALUE fc);
 
 VALUE application_tick(VALUE self, VALUE r_pattern);

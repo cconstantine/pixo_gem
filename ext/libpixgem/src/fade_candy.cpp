@@ -6,6 +6,8 @@ FadeCandyHolder::FadeCandyHolder() : fade_candy(nullptr) { }
 
 FadeCandyHolder::~FadeCandyHolder() {
   if(fade_candy) {
+    fade_candy->clear();
+
     delete fade_candy;
   }
 }
