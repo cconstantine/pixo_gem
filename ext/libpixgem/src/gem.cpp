@@ -37,7 +37,9 @@ extern "C" void Init_libpixgem() {
 
   VALUE PatternClass = rb_define_class_under(Native, "Pattern", rb_cObject);
   rb_define_alloc_func(PatternClass, pattern_allocate);
-  rb_define_method(PatternClass, "initialize", (VALUE(*)(ANYARGS))pattern_initialize, 2);
+  rb_define_method(PatternClass, "initialize",  (VALUE(*)(ANYARGS))pattern_initialize, 1);
+  rb_define_method(PatternClass, "reset_start", (VALUE(*)(ANYARGS))pattern_reset_start, 0);
+  rb_define_method(PatternClass, "elapsed",     (VALUE(*)(ANYARGS))pattern_elapsed, 0);
 
 
   VALUE ApplicationClass = rb_define_class_under(Native, "Application", rb_cObject);

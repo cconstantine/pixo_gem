@@ -19,4 +19,7 @@ public:
 
 VALUE pattern_allocate(VALUE klass);
 
-VALUE pattern_initialize(VALUE self, VALUE rb_name, VALUE rb_string);
+VALUE pattern_initialize(VALUE self, VALUE rb_string);
+
+VALUE pattern_reset_start(VALUE self);
+VALUE pattern_elapsed(VALUE self);

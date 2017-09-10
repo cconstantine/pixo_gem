@@ -25,7 +25,9 @@ Gem::Specification.new do |spec|
   spec.extensions << "ext/libpixgem/extconf.rb"
 
 
-  spec.files = Dir['**/*'].keep_if { |file| File.file?(file) && !file.end_with?(".so")}
+  spec.files = Dir['**/*'].keep_if do |file|
+    File.file?(file) && !file.end_with?(".so")
+  end
   #spec.files         = `git ls-files -z`.split("\x0").reject do |f|
   #  f.match(%r{^(test|spec|features)/})
   #end

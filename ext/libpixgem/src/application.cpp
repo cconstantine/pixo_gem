@@ -67,7 +67,6 @@ VALUE application_initialize(VALUE self)
     ALOGV( "Failed to initialize GLEW\n");
     getchar();
   }
-  glEnable(GL_DEPTH_TEST);
 
   holder->app = new App();
   return self;
@@ -81,16 +80,21 @@ VALUE application_tick(VALUE self, VALUE r_pattern)
 
   PatternHolder * pattern_holder;
   Data_Get_Struct(r_pattern, PatternHolder, pattern_holder);
- 
-  if(!app_holder->window) {
-    return self;
-  }
-    
-  if(!glfwWindowShouldClose(app_holder->window)) {
+
+  if (app_holder->window) {
     glfwMakeContextCurrent(app_holder->window);
-    glEnable(GL_DEPTH_TEST);
+
     glfwPollEvents();
 
+    if (glfwWindowShouldClose(app_holder->window)) {
+
+      // Close OpenGL window and terminate GLFW
+      glfwDestroyWindow(app_holder->window);
+      app_holder->window = nullptr;
+
+      return Qfalse;
+    }
+    glEnable(GL_DEPTH_TEST);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     int width, height;
@@ -109,16 +113,9 @@ VALUE application_tick(VALUE self, VALUE r_pattern)
         glErr = glGetError();
     }
 
-  } else if (app_holder->window) {
-    glfwMakeContextCurrent(app_holder->window);
-
-    
-    // Close OpenGL window and terminate GLFW
-    glfwDestroyWindow(app_holder->window);
-    app_holder->window = nullptr;
+    return Qtrue;
   }
-
-  return self;
+  return Qfalse;
 }
 
 
@@ -133,4 +130,6 @@ VALUE application_add_fadecandy(VALUE self, VALUE fc)
 
   app_holder->fade_candies.push_back(fc);
   app_holder->app->addFadeCandy(fadecandy_holder->fade_candy);
+
+  return self;
 }
