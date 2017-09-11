@@ -17,7 +17,7 @@ Gem::Specification.new do |spec|
   spec.extensions << "ext/libpixgem/extconf.rb"
 
 
-  spec.files = Dir['**/*'].keep_if do |file|
+  spec.files = (Dir['*'] + Dir['bin/**/*'] + Dir['ext/**/*'] + Dir['lib/**/*'] ).keep_if do |file|
     File.file?(file) && !file.end_with?(".so")
   end
   #spec.files         = `git ls-files -z`.split("\x0").reject do |f|

@@ -10,6 +10,16 @@ ApplicationHolder::ApplicationHolder() :
 { }
 
 ApplicationHolder::~ApplicationHolder() {
+  for(VALUE fc : fade_candies) {
+
+    FadeCandyHolder * holder;
+
+    Data_Get_Struct(fc, FadeCandyHolder, holder);
+    if(holder->fade_candy) {
+      holder->fade_candy->clear();
+    }
+  }
+
   if(app) {
     delete app;
     app = nullptr;
