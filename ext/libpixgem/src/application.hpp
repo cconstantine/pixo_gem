@@ -21,6 +21,8 @@ public:
 
 VALUE application_allocate(VALUE klass);
 
+VALUE application_close(VALUE self);
+
 VALUE application_initialize(VALUE self);
 
 VALUE application_add_fadecandy(VALUE self, VALUE fc);

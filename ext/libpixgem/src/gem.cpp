@@ -41,10 +41,10 @@ extern "C" void Init_libpixgem() {
   rb_define_method(PatternClass, "reset_start", (VALUE(*)(ANYARGS))pattern_reset_start, 0);
   rb_define_method(PatternClass, "elapsed",     (VALUE(*)(ANYARGS))pattern_elapsed, 0);
 
-
   VALUE ApplicationClass = rb_define_class_under(Native, "Application", rb_cObject);
   rb_define_alloc_func(ApplicationClass, application_allocate);
   rb_define_method(ApplicationClass, "initialize", (VALUE(*)(ANYARGS))application_initialize, 0);
+  rb_define_method(ApplicationClass, "close", (VALUE(*)(ANYARGS))application_close, 0);
   rb_define_method(ApplicationClass, "tick", (VALUE(*)(ANYARGS))application_tick, 1);
   rb_define_method(ApplicationClass, "add_fadecandy", (VALUE(*)(ANYARGS))application_add_fadecandy, 1);
 

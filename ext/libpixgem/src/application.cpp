@@ -14,16 +14,38 @@ ApplicationHolder::~ApplicationHolder() {
     delete app;
     app = nullptr;
   }
-
-  if (window) {
-    glfwMakeContextCurrent(window);
-
-    // Close OpenGL window and terminate GLFW
-    glfwDestroyWindow(window);
-    window = nullptr;
-  }
-
 }
+
+VALUE application_close(VALUE self)
+{
+  ApplicationHolder * holder;
+
+  Data_Get_Struct(self, ApplicationHolder, holder);
+  if(holder->window) {
+
+    for(VALUE fc : holder->fade_candies) {
+
+      FadeCandyHolder * holder;
+
+      Data_Get_Struct(fc, FadeCandyHolder, holder);
+      if(holder->fade_candy) {
+        holder->fade_candy->clear();
+      }
+    }
+
+
+    glfwMakeContextCurrent(holder->window);
+
+    glfwSetWindowShouldClose(holder->window, true);
+    glfwPollEvents();
+    // Close OpenGL window and terminate GLFW
+    glfwDestroyWindow(holder->window);
+    holder->window = nullptr;
+    return Qtrue;
+  }
+  return Qfalse;
+}
+
 
 void application_mark(ApplicationHolder * holder)
 {
