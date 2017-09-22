@@ -2,6 +2,10 @@
 cmake_minimum_required(VERSION 3.0)
 project(pixo)
 
+if (APPLE)
+  set(CMAKE_FIND_FRAMEWORK LAST)
+  set(CMAKE_FIND_APPBUNDLE LAST)
+endif()
 
 include_directories( ${CMAKE_CURRENT_SOURCE_DIR}/libpixgem/include )
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/pixo EXCLUDE_FROM_ALL)
@@ -25,7 +29,17 @@ add_library(pixgem SHARED
   libpixgem/src/fade_candy.cpp
   libpixgem/src/camera.cpp
   )
-target_link_libraries(pixgem glfw libglew_static pthread  pixlib)
+
+
+if (APPLE)
+  set_target_properties(pixgem
+    PROPERTIES
+    SUFFIX ".bundle"
+    LINK_FLAGS "-flat_namespace" )
+endif()
+
+
+target_link_libraries(pixgem glfw libglew_static pthread  pixlib ${RUBY_LIBRARY})
 
 # Ruby gems require a install target.
 install(TARGETS pixgem
