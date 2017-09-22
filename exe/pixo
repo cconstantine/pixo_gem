@@ -1,0 +1,5 @@
+#!/usr/bin/env ruby
+
+require 'pixo'
+
+Pixo::Application.new.run
