@@ -16,7 +16,7 @@ module Pixo
       service.request(Pixo::Renderer::GetPatternName.new)
     end
 
-    def set_pattern(name)
+    def active_pattern=(name)
       service.request(Pixo::Renderer::SetPattern.new(name))
     end
 
