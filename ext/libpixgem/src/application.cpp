@@ -104,7 +104,7 @@ VALUE application_initialize(VALUE self)
   return self;
 }
 
-VALUE application_tick(VALUE self, VALUE r_pattern)
+VALUE application_tick(VALUE self, VALUE r_pattern, VALUE r_brightness)
 {
   GLenum glErr;
   ApplicationHolder * app_holder;
@@ -112,6 +112,8 @@ VALUE application_tick(VALUE self, VALUE r_pattern)
 
   PatternHolder * pattern_holder;
   Data_Get_Struct(r_pattern, PatternHolder, pattern_holder);
+
+  float brightness = (float)NUM2DBL(r_brightness);
 
   if (app_holder->window) {
     glfwMakeContextCurrent(app_holder->window);
@@ -132,7 +134,7 @@ VALUE application_tick(VALUE self, VALUE r_pattern)
     int width, height;
     glfwGetFramebufferSize(app_holder->window, &width, &height);
 
-    app_holder->app->tick(pattern_holder->pattern, width, height);
+    app_holder->app->tick(pattern_holder->pattern, brightness, width, height);
 
     app_holder->app->move_perspective_to_camera();
 

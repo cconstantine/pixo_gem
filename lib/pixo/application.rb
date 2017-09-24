@@ -5,7 +5,7 @@ require File.expand_path('../../libpixgem', __FILE__)
 
 module Pixo
   class Application < Pixo::Native::Application
-    attr_accessor :running
+    attr_accessor :running, :leds_on
 
     def self.instance
       @instance ||= Pixo::Application.new
@@ -13,7 +13,7 @@ module Pixo
 
     def run
       while(running)
-        self.running = tick(active_pattern) && running
+        self.running = tick(active_pattern, brightness) && running
       end
       close
     end
@@ -47,12 +47,27 @@ module Pixo
       pattern.reset_start
       @active_pattern = pattern
     end
-  
+
+    def brightness=(val)
+      if val > 1.0
+        val = 1.0
+      elsif val < 0.0
+        val = 0.0
+      end
+      @brightness = val
+    end
+
+    def brightness
+      leds_on ? @brightness : 0.0
+    end
+
   private
 
     def initialize()
       super
       self.running = true
+      self.brightness = 1.0
+      self.leds_on    = true
 
       add_fadecandy(Pixo::Native::FadeCandy.new('localhost', 8))
     end

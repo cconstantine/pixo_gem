@@ -27,4 +27,4 @@ VALUE application_initialize(VALUE self);
 
 VALUE application_add_fadecandy(VALUE self, VALUE fc);
 
-VALUE application_tick(VALUE self, VALUE r_pattern);
+VALUE application_tick(VALUE self, VALUE r_pattern, VALUE r_brightness);
