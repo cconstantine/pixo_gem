@@ -1,5 +1,13 @@
 #!/usr/bin/env ruby
 
 require 'pixo'
+require 'pixo/application'
 
-Pixo::Application.new.run
+
+service_thread = Thread.new do
+  sleep 0.1
+  Pixo::Ipc::Service.new(STDIN, STDOUT).run
+  Pixo::Application.instance.shutdown
+end
+
+Pixo::Application.instance.run
