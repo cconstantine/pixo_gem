@@ -13,6 +13,11 @@ module Pixo
 
     def run
       while(running)
+        @procs_lock.synchronize {
+          @procs.each {|proc| proc.call(self) }
+          @procs.clear
+        }
+
         self.running = tick(active_pattern, brightness) && running
       end
       close
@@ -20,6 +25,13 @@ module Pixo
 
     def shutdown
       self.running = false
+    end
+
+    def post(proc)
+
+      @procs_lock.synchronize {
+        @procs << proc
+      }
     end
 
 
@@ -68,8 +80,10 @@ module Pixo
       self.running = true
       self.brightness = 1.0
       self.leds_on    = true
+      @procs = Array.new
 
-      add_fadecandy(Pixo::Native::FadeCandy.new('localhost', 8))
+      @procs_lock = Mutex.new
+      #
     end
   end
 end

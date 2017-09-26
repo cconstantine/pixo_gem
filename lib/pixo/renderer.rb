@@ -36,7 +36,24 @@ module Pixo
       service.request(Pixo::Renderer::GetLedsOn.new())
     end
 
+    def add_fadecandy(hostname, count)
+      service.request(Pixo::Renderer::AddFadecandy.new(hostname, count))
+    end
+
     private
+
+    class AddFadecandy
+      def initialize(hostname, count)
+        @hostname = hostname
+        @count = count
+      end
+
+      def call
+        Pixo::Application.instance.post Proc.new { |app| app.add_fadecandy(Pixo::Native::FadeCandy.new(@hostname, @count)) }
+        self
+      end
+    end
+
     class GetPatternName
       def call
         Pixo::Application.instance.patterns.key(Pixo::Application.instance.active_pattern)
