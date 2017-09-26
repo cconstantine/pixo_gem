@@ -3,11 +3,13 @@
 require 'pixo'
 require 'pixo/application'
 
+app = Pixo::Application.instance
 
 service_thread = Thread.new do
-  sleep 0.1
   Pixo::Ipc::Service.new(STDIN, STDOUT).run
-  Pixo::Application.instance.shutdown
+  app.shutdown
 end
+Signal.trap('INT')  { app.shutdown }
+Signal.trap('TERM') { app.shutdown }
 
-Pixo::Application.instance.run
+app.run

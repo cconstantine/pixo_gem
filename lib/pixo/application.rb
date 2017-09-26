@@ -20,6 +20,7 @@ module Pixo
 
         self.running = tick(active_pattern, brightness) && running
       end
+    ensure
       close
     end
 
