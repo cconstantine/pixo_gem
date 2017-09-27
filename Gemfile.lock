@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    pixo (0.2.5)
+    pixo (0.2.6)
       concurrent-ruby
 
 GEM
