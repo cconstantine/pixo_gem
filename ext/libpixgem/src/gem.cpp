@@ -46,6 +46,7 @@ extern "C" void Init_libpixgem() {
   rb_define_method(ApplicationClass, "initialize", (VALUE(*)(ANYARGS))application_initialize, 0);
   rb_define_method(ApplicationClass, "close", (VALUE(*)(ANYARGS))application_close, 0);
   rb_define_method(ApplicationClass, "tick", (VALUE(*)(ANYARGS))application_tick, 2);
+  rb_define_method(ApplicationClass, "key_callback", (VALUE(*)(ANYARGS))application_key_callback, 4);
   rb_define_method(ApplicationClass, "add_fadecandy", (VALUE(*)(ANYARGS))application_add_fadecandy, 1);
 
   VALUE FadeCandyClass = rb_define_class_under(Native, "FadeCandy", rb_cObject);

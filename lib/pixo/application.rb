@@ -7,11 +7,29 @@ module Pixo
   class Application < Pixo::Native::Application
     attr_accessor :running, :leds_on
 
-    def self.instance
-      @instance ||= Pixo::Application.new
+    def initialize()
+      super
+      self.running = false
+      self.brightness = 1.0
+      self.leds_on    = true
+      @procs = Array.new
+
+      @procs_lock = Mutex.new
+    
+      @service = Pixo::Ipc::Service.new(STDIN, STDOUT, user_data: self)
+
+      @service_thread = Thread.new do
+        while(!self.running)
+          sleep 0.1
+        end
+        @service.run
+        self.shutdown
+      end
     end
 
     def run
+      self.running = tick(active_pattern, brightness)
+      
       while(running)
         @procs_lock.synchronize {
           @procs.each {|proc| proc.call(self) }
@@ -29,12 +47,14 @@ module Pixo
     end
 
     def post(proc)
-
       @procs_lock.synchronize {
         @procs << proc
       }
     end
 
+    def key_callback(key, scancode, action, mods)
+      @service.request(Pixo::Renderer::OnKey.new(key, scancode, action, mods))
+    end
 
     def patterns
       unless @patterns
@@ -74,18 +94,12 @@ module Pixo
       leds_on ? @brightness : 0.0
     end
 
-  private
+    private
 
-    def initialize()
-      super
-      self.running = true
-      self.brightness = 1.0
-      self.leds_on    = true
-      @procs = Array.new
 
-      @procs_lock = Mutex.new
-      #
-    end
+
   end
+
+
 end
 

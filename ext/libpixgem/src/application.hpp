@@ -17,9 +17,13 @@ public:
   GLFWwindow* window;
 
   std::vector<VALUE> fade_candies;
+
+  VALUE self;
 };
 
 VALUE application_allocate(VALUE klass);
+
+VALUE application_key_callback(VALUE self, VALUE key, VALUE scancode, VALUE action, VALUE mods);
 
 VALUE application_close(VALUE self);
 

@@ -78,6 +78,8 @@ VALUE application_initialize(VALUE self)
   ApplicationHolder * holder;
 
   Data_Get_Struct(self, ApplicationHolder, holder);
+
+  holder->self = self;
  
   glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
   glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
@@ -101,8 +103,23 @@ VALUE application_initialize(VALUE self)
   }
 
   holder->app = new App();
+  glfwSetWindowUserPointer(holder->window, holder);
+
+  glfwSetKeyCallback(holder->window,
+      [](GLFWwindow *window, int key, int scancode, int action, int mods) {
+          if (action == GLFW_REPEAT) {
+            return;
+          }
+
+          ApplicationHolder *holder = (ApplicationHolder *)glfwGetWindowUserPointer(window);
+
+          rb_funcall(holder->self, rb_intern("key_callback"), 4, INT2NUM(key), INT2NUM(scancode), INT2NUM(action), INT2NUM(mods));
+        });
   return self;
 }
+
+VALUE application_key_callback(VALUE self, VALUE key, VALUE scancode, VALUE action, VALUE mods)
+{ }
 
 VALUE application_tick(VALUE self, VALUE r_pattern, VALUE r_brightness)
 {

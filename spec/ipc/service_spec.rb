@@ -2,7 +2,7 @@ require 'spec_helper'
 require 'pixo'
 
 class TestCallable
-  def call
+  def call(service)
     "foo"
   end
 end

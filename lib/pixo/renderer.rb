@@ -2,10 +2,43 @@ module Pixo
   class Renderer
     attr_reader :service, :service_thread
 
-    def initialize()
-      i, o, t = Open3.popen2('bundle exec pixo') 
-      @service = Pixo::Ipc::Service.new(o, i)
-      @service_thread = Thread.new { self.service.run }
+    class OnKey
+      def initialize(key, scancode, action, mods)
+        @key = key
+        @scancode = scancode
+        @action = action
+        @mods = mods
+      end
+
+      def call(service)
+        service.on_key(@key, @scancode, @action, @mods)
+        self
+      end
+    end
+
+    class Service < Pixo::Ipc::Service
+      attr_reader :renderer
+
+      def initialize(renderer)
+        @renderer = renderer
+        i, o, t = Open3.popen2('bundle exec pixo')
+        super(o, i)
+        @service_thread = Thread.new { self.run }
+      end
+
+
+      def on_key(key, scancode, action, mods)
+        renderer.on_key(key, scancode, action, mods)
+      end
+
+    end
+
+    def initialize
+      @service = Pixo::Renderer::Service.new(self)
+    end
+
+    def on_key(key, scancode, action, mods)
+
     end
 
     def pattern_names
@@ -48,39 +81,39 @@ module Pixo
         @count = count
       end
 
-      def call
-        Pixo::Application.instance.post Proc.new { |app| app.add_fadecandy(Pixo::Native::FadeCandy.new(@hostname, @count)) }
+      def call(service)
+        service.user_data.post Proc.new { |app| app.add_fadecandy(Pixo::Native::FadeCandy.new(@hostname, @count)) }
         self
       end
     end
 
     class GetPatternName
-      def call
-        Pixo::Application.instance.patterns.key(Pixo::Application.instance.active_pattern)
+      def call(service)
+        service.user_data.patterns.key(service.user_data.active_pattern)
       end
     end
     
     class GetPatternNames
-      def call
-        Pixo::Application.instance.patterns.keys
+      def call(service)
+        service.user_data.patterns.keys
       end
     end
 
     class SetPattern
-      def initialize(pattern_name)
+      def initialize(pattern_name = nil)
         @pattern_name = pattern_name    
       end
 
-      def call
-        pattern = Pixo::Application.instance.patterns[@pattern_name]
-        Pixo::Application.instance.active_pattern = pattern if pattern
+      def call(service)
+        pattern = service.user_data.patterns[@pattern_name]
+        service.user_data.active_pattern = pattern
         @pattern_name
       end
     end
 
     class GetBrightness
-      def call
-        Pixo::Application.instance.brightness
+      def call(service)
+        service.user_data.brightness
       end
     end
 
@@ -89,15 +122,15 @@ module Pixo
         @brightness = brightness    
       end
 
-      def call
-        Pixo::Application.instance.brightness = @brightness
+      def call(service)
+        service.user_data.brightness = @brightness
       end
     end
 
 
     class GetLedsOn
-      def call
-        Pixo::Application.instance.leds_on
+      def call(service)
+        service.user_data.leds_on
       end
     end
 
@@ -106,8 +139,8 @@ module Pixo
         @leds_on = leds_on    
       end
 
-      def call
-        Pixo::Application.instance.leds_on = @leds_on
+      def call(service)
+        service.user_data.leds_on = @leds_on
       end
     end
 
