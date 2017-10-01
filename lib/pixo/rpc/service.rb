@@ -3,11 +3,9 @@ require 'securerandom'
 require 'base64'
 require 'thread'
 
-module Pixo::Ipc
+module Pixo::Rpc
   class Service
-    attr_reader :user_data
-
-    def initialize(reader_pipe, writer_pipe, user_data: nil)
+    def initialize(reader_pipe, writer_pipe)
       @reader_pipe = reader_pipe
       @writer_pipe = writer_pipe
 
@@ -15,15 +13,13 @@ module Pixo::Ipc
       @live_requests = Concurrent::Hash.new
 
       @pipe_mutex = Mutex.new
-
-      @user_data = user_data
     end
 
     def run
       while @running && (line = @reader_pipe.readline)
         message = Marshal.load(Base64.strict_decode64(line.strip))
-        if message.is_a?(Pixo::Ipc::RequestMessage)
-          resp = Pixo::Ipc::ResponseMessage.new(message.data.call(self), message.rid)
+        if message.is_a?(Pixo::Rpc::RequestMessage)
+          resp = Pixo::Rpc::ResponseMessage.new(message.data.call(self), message.rid)
 
           bytes_to_write = Base64.strict_encode64(Marshal.dump(resp))
           @pipe_mutex.synchronize do
@@ -31,7 +27,7 @@ module Pixo::Ipc
             @writer_pipe.write($/)
             @writer_pipe.flush
           end
-        elsif message.is_a?(Pixo::Ipc::ResponseMessage)
+        elsif message.is_a?(Pixo::Rpc::ResponseMessage)
           @live_requests[message.rid]
           request = @live_requests[message.rid]
           request.send_result(message.data) if request
@@ -48,7 +44,7 @@ module Pixo::Ipc
     end 
 
     def request(message, timeout: 10, async: false)
-      request = Pixo::Ipc::Request.new(message)
+      request = Pixo::Rpc::Request.new(message)
       @live_requests[request.message.rid] = request unless async
 
       bytes_to_write = Base64.strict_encode64(Marshal.dump(request.message))
@@ -81,7 +77,7 @@ module Pixo::Ipc
     attr_reader   :latch
 
     def initialize(data)
-      @message = Pixo::Ipc::RequestMessage.new(data)
+      @message = Pixo::Rpc::RequestMessage.new(data)
 
       @latch = Concurrent::CountDownLatch.new(1)
     end

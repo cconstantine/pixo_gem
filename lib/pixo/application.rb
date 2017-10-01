@@ -6,44 +6,50 @@ require File.expand_path('../../libpixgem', __FILE__)
 module Pixo
   class Application < Pixo::Native::Application
     attr_accessor :running, :leds_on
+    attr_reader  :patterns
 
     def initialize()
       super
-      self.running = false
-      self.brightness = 1.0
-      self.leds_on    = true
       @procs = Array.new
 
       @procs_lock = Mutex.new
-    
-      @service = Pixo::Ipc::Service.new(STDIN, STDOUT, user_data: self)
+      @started_latch = Concurrent::CountDownLatch.new(1)
+      @service = Pixo::Rpc::ApplicationService.new(STDIN, STDOUT, self, @started_latch)
 
-      @service_thread = Thread.new do
-        while(!self.running)
-          sleep 0.1
-        end
-        @service.run
-        self.shutdown
-      end
+      @patterns = Concurrent::Hash.new
+
+      @active_pattern = BlankPattern.new
+      self.running = false
+      self.brightness = 1.0
+      self.leds_on    = true
     end
 
     def run
-      self.running = tick(active_pattern, brightness)
-      
+      self.running = tick(@active_pattern, brightness)
+      @started_latch.count_down
       while(running)
         @procs_lock.synchronize {
           @procs.each {|proc| proc.call(self) }
           @procs.clear
         }
 
-        self.running = tick(active_pattern, brightness) && running
+        self.running = tick(@active_pattern, brightness) && running
       end
     ensure
+      @service.shutdown
       close
     end
 
     def shutdown
       self.running = false
+    end
+
+    def add_pattern(name, code)
+      self.patterns[name] = Pixo::Native::Pattern.new(code)
+    end
+
+    def add_fadecandy(hostname, count)
+      super(Pixo::Native::FadeCandy.new(hostname, count))
     end
 
     def post(proc)
@@ -53,32 +59,21 @@ module Pixo
     end
 
     def key_callback(key, scancode, action, mods)
-      @service.request(Pixo::Renderer::OnKey.new(key, scancode, action, mods), async: true)
+      @service.request(Pixo::Rpc::OnKey.new(key, scancode, action, mods), async: true)
     end
 
-    def patterns
-      unless @patterns
-        @patterns = Hash.new
-        patterns_dir = File.join(File.dirname(__FILE__), "..", "..", 'ext', 'pixo', 'patterns')
-        Dir.entries(patterns_dir).each do | pattern_file|
-          next unless pattern_file.end_with?('.glsl')
-          @patterns[pattern_file] = Pixo::Native::Pattern.new(File.read(File.join(patterns_dir, pattern_file)))
-        end
+    def pattern=(name)
+      pat = patterns[name]
+      if (pat)
+        pat.reset_start
+        @active_pattern = pat
       end
-      @patterns
+
+      pattern
     end
 
-    def active_pattern
-      @active_pattern ||= random_pattern
-    end
-
-    def random_pattern
-      patterns[patterns.keys.sample]
-    end
-
-    def active_pattern=(pattern)
-      pattern.reset_start
-      @active_pattern = pattern
+    def pattern
+      patterns.key(@active_pattern)
     end
 
     def brightness=(val)
@@ -96,10 +91,18 @@ module Pixo
 
     private
 
+    class BlankPattern < Pixo::Native::Pattern
+      def initialize
+        super(<<-EOF)
+#version 330 core
+out vec4 color_out;
 
-
+void main( void ) {
+  color_out = vec4( 0.0, 0.0, 0.0, 1.0 );
+}
+           EOF
+      end
+    end
   end
-
-
 end
 

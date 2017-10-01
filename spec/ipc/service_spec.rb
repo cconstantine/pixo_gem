@@ -7,15 +7,15 @@ class TestCallable
   end
 end
 
-describe Pixo::Ipc::Service do
+describe Pixo::Rpc::Service do
   let!(:pipes1) { IO.pipe }
   let!(:pipes2) { IO.pipe }
 
-  it "do" do
+  it "sends messages" do
     threads = Set.new
 
-    service2 = Pixo::Ipc::Service.new(pipes2[0], pipes1[1])
-    service1 = Pixo::Ipc::Service.new(pipes1[0], pipes2[1])
+    service2 = Pixo::Rpc::Service.new(pipes2[0], pipes1[1])
+    service1 = Pixo::Rpc::Service.new(pipes1[0], pipes2[1])
 
     threads << Thread.new do
       service2.run

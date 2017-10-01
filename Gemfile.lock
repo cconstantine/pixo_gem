@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    pixo (0.3.2)
+    pixo (0.4.0)
       concurrent-ruby
 
 GEM
@@ -16,6 +16,8 @@ GEM
       rspec-core (~> 3.6.0)
       rspec-expectations (~> 3.6.0)
       rspec-mocks (~> 3.6.0)
+    rspec-collection_matchers (1.1.3)
+      rspec-expectations (>= 2.99.0.beta1)
     rspec-core (3.6.0)
       rspec-support (~> 3.6.0)
     rspec-expectations (3.6.0)
@@ -35,6 +37,7 @@ DEPENDENCIES
   rake (~> 10.0)
   rake-compiler (~> 1.0)
   rspec (>= 3.0)
+  rspec-collection_matchers (>= 1.1.3)
 
 BUNDLED WITH
    1.15.4
