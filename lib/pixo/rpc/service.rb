@@ -20,12 +20,13 @@ module Pixo::Rpc
         message = Marshal.load(Base64.strict_decode64(line.strip))
         if message.is_a?(Pixo::Rpc::RequestMessage)
           resp = Pixo::Rpc::ResponseMessage.new(message.data.call(self), message.rid)
-
-          bytes_to_write = Base64.strict_encode64(Marshal.dump(resp))
-          @pipe_mutex.synchronize do
-            @writer_pipe.write(bytes_to_write)
-            @writer_pipe.write($/)
-            @writer_pipe.flush
+          unless message.async
+            bytes_to_write = Base64.strict_encode64(Marshal.dump(resp))
+            @pipe_mutex.synchronize do
+              @writer_pipe.write(bytes_to_write)
+              @writer_pipe.write($/)
+              @writer_pipe.flush
+            end
           end
         elsif message.is_a?(Pixo::Rpc::ResponseMessage)
           @live_requests[message.rid]
@@ -35,6 +36,9 @@ module Pixo::Rpc
       end
     rescue EOFError => e
     rescue IOError => e
+    rescue
+      STDERR.puts("RUN: #{$!}")
+      $!.backtrace.each do |back| STDERR.puts(back) end
     end
 
     def shutdown
@@ -44,7 +48,7 @@ module Pixo::Rpc
     end 
 
     def request(message, timeout: 10, async: false)
-      request = Pixo::Rpc::Request.new(message)
+      request = Pixo::Rpc::Request.new(message, async)
       @live_requests[request.message.rid] = request unless async
 
       bytes_to_write = Base64.strict_encode64(Marshal.dump(request.message))
@@ -61,6 +65,9 @@ module Pixo::Rpc
       end
       
       return request.response
+    rescue
+      STDERR.puts "request: #{$!.inspect}"
+      raise
     ensure
       @live_requests.delete request.message.rid
     end
@@ -76,10 +83,10 @@ module Pixo::Rpc
     attr_reader   :response
     attr_reader   :latch
 
-    def initialize(data)
-      @message = Pixo::Rpc::RequestMessage.new(data)
+    def initialize(data, async)
+      @message = Pixo::Rpc::RequestMessage.new(data, async)
 
-      @latch = Concurrent::CountDownLatch.new(1)
+      @latch = Concurrent::CountDownLatch.new(1) unless async
     end
 
     def send_result(result)
@@ -98,9 +105,11 @@ module Pixo::Rpc
   end
 
   class RequestMessage < Message
-    def initialize(data)
+    attr_reader :async
+    def initialize(data, async)
       super(data)
       @rid  = "rid_#{SecureRandom.hex(10)}"
+      @async = async
     end
   end
 

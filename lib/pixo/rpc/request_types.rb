@@ -9,7 +9,7 @@ module Pixo::Rpc
     end
 
     def call(service)
-      service.on_key(@key, @scancode, @action, @mods)
+      Thread.new { service.on_key(@key, @scancode, @action, @mods) }
       self
     end
   end

@@ -18,4 +18,10 @@ module Pixo
     end
     @patterns
   end
+
+  def self.load_seed_patterns(renderer)
+    Pixo.seed_patterns.each do |name, code|
+      renderer.add_pattern(name, code)
+    end
+  end
 end

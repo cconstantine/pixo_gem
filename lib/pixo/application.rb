@@ -10,7 +10,7 @@ module Pixo
 
     def initialize()
       super
-      @procs = Array.new
+      @procs = Concurrent::Array.new
 
       @procs_lock = Mutex.new
       @started_latch = Concurrent::CountDownLatch.new(1)
@@ -68,8 +68,6 @@ module Pixo
         pat.reset_start
         @active_pattern = pat
       end
-
-      pattern
     end
 
     def pattern

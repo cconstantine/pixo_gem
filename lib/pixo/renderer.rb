@@ -9,7 +9,11 @@ module Pixo
     end
 
     def on_key(key, scancode, action, mods)
-
+      if (action == 0)
+        self.pattern = self.list_patterns.sample
+        return true
+      end
+      return false
     end
 
     def list_patterns
