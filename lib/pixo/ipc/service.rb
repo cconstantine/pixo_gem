@@ -47,9 +47,9 @@ module Pixo::Ipc
       @writer_pipe.close
     end 
 
-    def request(message, timeout: 10)
+    def request(message, timeout: 10, async: false)
       request = Pixo::Ipc::Request.new(message)
-      @live_requests[request.message.rid] = request
+      @live_requests[request.message.rid] = request unless async
 
       bytes_to_write = Base64.strict_encode64(Marshal.dump(request.message))
       @pipe_mutex.synchronize do
@@ -57,6 +57,8 @@ module Pixo::Ipc
         @writer_pipe.write($/)
         @writer_pipe.flush
       end
+
+      return if async
 
       unless request.latch.wait(timeout)
         raise Timeout::Error.new("%s: request timed out after %.3f seconds." % [request.message.rid, timeout] )

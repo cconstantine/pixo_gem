@@ -70,7 +70,7 @@ module Pixo
     end
 
     def add_fadecandy(hostname, count)
-      service.request(Pixo::Renderer::AddFadecandy.new(hostname, count))
+      service.request(Pixo::Renderer::AddFadecandy.new(hostname, count), async: true)
     end
 
     private

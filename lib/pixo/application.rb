@@ -53,7 +53,7 @@ module Pixo
     end
 
     def key_callback(key, scancode, action, mods)
-      @service.request(Pixo::Renderer::OnKey.new(key, scancode, action, mods))
+      @service.request(Pixo::Renderer::OnKey.new(key, scancode, action, mods), async: true)
     end
 
     def patterns
