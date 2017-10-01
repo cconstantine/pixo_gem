@@ -50,7 +50,7 @@ module Pixo
     end
 
     def active_pattern=(name)
-      service.request(Pixo::Renderer::SetPattern.new(name))
+      service.request(Pixo::Renderer::SetPattern.new(name), async: true)
     end
 
     def brightness=(brightness)
