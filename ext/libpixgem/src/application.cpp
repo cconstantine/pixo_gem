@@ -88,7 +88,9 @@ VALUE application_initialize(VALUE self)
   glfwWindowHint(GLFW_DEPTH_BITS, 24 );
 
   // Open a window and create its OpenGL context
-  holder->window = glfwCreateWindow( 800, 800, "Pixo", NULL, NULL);
+  GLFWmonitor* monitor = glfwGetPrimaryMonitor();
+  const GLFWvidmode* mode = glfwGetVideoMode(monitor);
+  holder->window = glfwCreateWindow( mode->width, mode->height, "Pixo", monitor, NULL);
   if( holder->window == NULL ){
       ALOGV( "Failed to open GLFW window. If you have an Intel GPU, they are not 3.3 compatible. Try the 2.1 version of the tutorials.\n" );
       getchar();
