@@ -27,7 +27,7 @@ VALUE application_key_callback(VALUE self, VALUE key, VALUE scancode, VALUE acti
 
 VALUE application_close(VALUE self);
 
-VALUE application_initialize(VALUE self);
+VALUE application_initialize(VALUE self, VALUE rb_full_screen);
 
 VALUE application_add_fadecandy(VALUE self, VALUE fc);
 

@@ -8,8 +8,8 @@ module Pixo
     attr_accessor :running, :leds_on
     attr_reader  :patterns
 
-    def initialize()
-      super
+    def initialize(full_screen = nil)
+      super(full_screen)
       @procs = Concurrent::Array.new
 
       @procs_lock = Mutex.new

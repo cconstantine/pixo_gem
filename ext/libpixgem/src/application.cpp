@@ -73,13 +73,14 @@ VALUE application_allocate(VALUE klass)
 }
 
 
-VALUE application_initialize(VALUE self)
+VALUE application_initialize(VALUE self, VALUE rb_full_screen)
 {
   ApplicationHolder * holder;
 
   Data_Get_Struct(self, ApplicationHolder, holder);
 
   holder->self = self;
+
  
   glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
   glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
@@ -90,7 +91,18 @@ VALUE application_initialize(VALUE self)
   // Open a window and create its OpenGL context
   GLFWmonitor* monitor = glfwGetPrimaryMonitor();
   const GLFWvidmode* mode = glfwGetVideoMode(monitor);
-  holder->window = glfwCreateWindow( mode->width, mode->height, "Pixo", monitor, NULL);
+
+  int width = mode->width;
+  int height = mode->height;
+
+  if(!RTEST(rb_full_screen) ) {
+    width = width / 4;
+    height = height / 4;
+    monitor = NULL;
+  }
+
+
+  holder->window = glfwCreateWindow( width, height, "Pixo", monitor, NULL);
   if( holder->window == NULL ){
       ALOGV( "Failed to open GLFW window. If you have an Intel GPU, they are not 3.3 compatible. Try the 2.1 version of the tutorials.\n" );
       getchar();

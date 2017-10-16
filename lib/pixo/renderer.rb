@@ -2,8 +2,8 @@ module Pixo
   class Renderer < Pixo::Rpc::Service
     attr_reader :service_thread
 
-    def initialize
-      i, o, t = Open3.popen2('bundle exec pixo')
+    def initialize(fullscreen = false)
+      i, o, t = Open3.popen2("bundle exec pixo #{'--fullscreen' if fullscreen}")
       super(o, i)
       @service_thread = Thread.new { self.run }
     end

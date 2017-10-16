@@ -2,8 +2,16 @@
 
 require 'pixo'
 require 'pixo/application'
+require 'optparse'
 
-app = Pixo::Application.new
+
+options = {}
+OptionParser.new do |opts|
+  opts.on('-f', '--fullscreen', 'Start in fullscreen mode') { |v| options[:fullscreen] = v }
+end.parse!
+
+
+app = Pixo::Application.new(options[:fullscreen])
 
 Signal.trap('INT')  { app.shutdown }
 Signal.trap('TERM') { app.shutdown }
