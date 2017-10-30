@@ -167,7 +167,7 @@ VALUE application_tick(VALUE self, VALUE r_pattern, VALUE r_brightness)
 
     app_holder->app->tick(pattern_holder->pattern, brightness, width, height);
 
-    app_holder->app->move_perspective_to_camera();
+    app_holder->app->move_camera_to_perspective();
 
     glfwSwapBuffers(app_holder->window);
 
