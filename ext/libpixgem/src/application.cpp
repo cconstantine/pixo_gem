@@ -167,7 +167,10 @@ VALUE application_tick(VALUE self, VALUE r_pattern, VALUE r_brightness)
 
     app_holder->app->tick(pattern_holder->pattern, brightness, width, height);
 
-    app_holder->app->move_camera_to_perspective();
+    if (app_holder->app->frame_timer.duration() > 0) {
+      float rotate_by = 5 * app_holder->app->frame_timer.duration();
+      app_holder->app->viewed_from.rotate(rotate_by);
+    }
 
     glfwSwapBuffers(app_holder->window);
 
